@@ -75,6 +75,79 @@ lastAction = now;
 server.send(200, "text/html", "<html><body><h2>Puerta cerrada</h2><a href='/'>Volver</a></body></html>");
 }
 
+void handleConfigGet() {
+  const char* htmlConfigPage = R"rawliteral(
+<!DOCTYPE html>
+<html>
+<head>
+  <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+  <title>Configurar puerta</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { font-family: Arial, sans-serif; margin:0; padding:0; background:#f0f2f5; }
+    .container { max-width: 600px; margin: 0 auto; padding: 16px; }
+    .card { background:#fff; padding: 16px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,.1); }
+    h2 { margin-top: 0; }
+    label { display:block; margin:12px 0 6px; font-weight:600; }
+    .row { display:flex; gap:12px; align-items:center; justify-content:flex-start; flex-wrap:wrap; }
+    .btn { padding:10px 16px; border-radius:8px; border:1px solid #0b7; background:#e0f2f1; cursor:pointer; }
+    @media (max-width: 600px) {
+      .container { padding: 8px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="card">
+      <h2>Configurar estado inicial de la puerta</h2>
+      <form id="configForm" action="/config/set" method="POST">
+        <label>Estado inicial</label>
+        <div class="row">
+          <input type="radio" id="open" name="state" value="OPEN" checked>
+          <label for="open">Abierta</label>
+          <input type="radio" id="closed" name="state" value="CLOSED" style="margin-left:16px;">
+          <label for="closed">Cerrada</label>
+        </div>
+        <div style="margin-top:12px;">
+          <button class="btn" type="submit">Aplicar</button>
+        </div>
+      </form>
+      <div id="status" style="margin-top:8px; color:#555; font-size:0.9em;"></div>
+    </div>
+  </div>
+  <script>
+    document.getElementById('configForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const formData = new FormData(this);
+      const data = new URLSearchParams(formData);
+      fetch('/config/set', { method: 'POST', body: data })
+        .then(res => res.text())
+        .then(txt => { document.getElementById('status').innerText = txt; });
+    });
+  </script>
+</body>
+</html>
+)rawliteral";
+  server.send(200, "text/html", htmlConfigPage);
+}
+
+void handleConfigSet() {
+  if (server.hasArg("state")) {
+    String st = server.arg("state");
+    if (st == "OPEN") {
+      digitalWrite(doorPin, HIGH);
+      doorOpen = true;
+    } else if (st == "CLOSED") {
+      digitalWrite(doorPin, LOW);
+      doorOpen = false;
+    }
+    server.send(200, "text/plain", "Estado inicial aplicado: " + st);
+  } else {
+    server.send(400, "text/plain", "Faltan datos");
+  }
+}
+
+
 void setup() {
 pinMode(doorPin, OUTPUT);
 digitalWrite(doorPin, LOW); // Por defecto cerrado
@@ -90,6 +163,8 @@ server.on("/", handleRoot);
 server.on("/door/state", HTTP_GET, handleDoorState);
 server.on("/door/open", HTTP_GET, handleDoorOpen);
 server.on("/door/close", HTTP_GET, handleDoorClose);
+server.on("/config", HTTP_GET, handleConfigGet);
+server.on("/config/set", HTTP_POST, handleConfigSet);
 
 server.begin();
 }
