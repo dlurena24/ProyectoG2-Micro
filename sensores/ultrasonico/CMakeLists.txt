@@ -1,12 +1,11 @@
 idf_component_register(
-    SRCS 
-        "ultrasonico_timer.c"
-        "ultrasonico_isr.c"
+    SRCS
         "ultrasonico.c"
-    INCLUDE_DIRS 
+        "ultrasonico_isr.c"
+        "ultrasonico_timer.c"
+    INCLUDE_DIRS
         "."
-    REQUIRES 
-        soc
-        esp_common
+    REQUIRES
         driver
+        esp_common
 )

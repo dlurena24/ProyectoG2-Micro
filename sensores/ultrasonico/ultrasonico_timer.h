@@ -3,13 +3,13 @@
 
 #include <stdint.h>
 
-// Inicializa Timer Group 0, Timer 0 como contador libre a 1 MHz (1us por tick)
+// Inicializa Timer Group 0, Timer 0 como contador libre a ~1 MHz (1 us por tick)
 void ultrasonico_timer_init(void);
 
-// Retorna el tiempo actual del timer en microsegundos
+// Devuelve el valor actual del timer en microsegundos
 uint64_t ultrasonico_timer_get_us(void);
 
-// Reinicia el contador a cero
+// Pone el contador en cero
 void ultrasonico_timer_reset(void);
 
-#endif
+#endif // ULTRASONICO_TIMER_H

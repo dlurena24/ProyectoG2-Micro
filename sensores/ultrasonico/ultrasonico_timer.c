@@ -1,64 +1,48 @@
 #include "ultrasonico_timer.h"
-#include "soc/timer_group_struct.h"
-#include "soc/timer_group_reg.h"
-#include "soc/timer_group_reg.h"
-#include "esp_err.h"
+#include "driver/timer.h"
 
-// Timer Group 0, Timer 0
-#define TIMERG       TIMERG0
-#define TIMER_INDEX  0
+#define ULTRA_TIMER_GROUP   TIMER_GROUP_0
+#define ULTRA_TIMER_INDEX   TIMER_0
 
-// El APB clock corre a 80MHz → si dividimos entre 80, obtenemos 1MHz (1us por tick)
-#define TIMER_DIVIDER     80
+// 80 MHz / 80 = 1 MHz -> 1 tick = 1 us
+#define ULTRA_TIMER_DIVIDER 80
 
 void ultrasonico_timer_init(void)
 {
-    // 1. Detener timer
-    TIMERG.hw_timer[TIMER_INDEX].config.enable = 0;
+    timer_config_t config = {
+        .divider = ULTRA_TIMER_DIVIDER,
+        .counter_dir = TIMER_COUNT_UP,
+        .counter_en = TIMER_PAUSE,      // empezamos pausado
+        .alarm_en = TIMER_ALARM_DIS,
+        .auto_reload = false,
+    };
 
-    // 2. Configurar divisor (80 MHz / 80 = 1 MHz = 1 tick = 1us)
-    TIMERG.hw_timer[TIMER_INDEX].config.divider = TIMER_DIVIDER;
+    // Configurar el timer
+    timer_init(ULTRA_TIMER_GROUP, ULTRA_TIMER_INDEX, &config);
 
-    // 3. Contador hacia arriba
-    TIMERG.hw_timer[TIMER_INDEX].config.direction = 0;  // 0 = up, 1 = down
+    // Poner contador en 0
+    timer_set_counter_value(ULTRA_TIMER_GROUP, ULTRA_TIMER_INDEX, 0);
 
-    // 4. Modo one-shot = 0 (conteo libre)
-    TIMERG.hw_timer[TIMER_INDEX].config.autoreload = 0;
-
-    // 5. Valor inicial = 0
-    TIMERG.hw_timer[TIMER_INDEX].load_high = 0;
-    TIMERG.hw_timer[TIMER_INDEX].load_low  = 0;
-    TIMERG.hw_timer[TIMER_INDEX].reload = 1;
-
-    // 6. Habilitar incremento
-    TIMERG.hw_timer[TIMER_INDEX].config.increase = 1;
-
-    // 7. Iniciar conteo
-    TIMERG.hw_timer[TIMER_INDEX].config.enable = 1;
+    // Arrancar el conteo
+    timer_start(ULTRA_TIMER_GROUP, ULTRA_TIMER_INDEX);
 }
 
 uint64_t ultrasonico_timer_get_us(void)
 {
-    // Leer registros de 64 bits: cnt_high y cnt_low
-    uint32_t low  = TIMERG.hw_timer[TIMER_INDEX].cnt_low;
-    uint32_t high = TIMERG.hw_timer[TIMER_INDEX].cnt_high;
-
-    // Ensamblar 64 bits
-    uint64_t value = ((uint64_t)high << 32) | low;
-
-    return value;  // Este valor está en microsegundos
+    uint64_t value = 0;
+    timer_get_counter_value(ULTRA_TIMER_GROUP, ULTRA_TIMER_INDEX, &value);
+    // Con divisor 80, cada tick = 1 us
+    return value;
 }
 
 void ultrasonico_timer_reset(void)
 {
-    // Detener el timer
-    TIMERG.hw_timer[TIMER_INDEX].config.enable = 0;
+    // Pausar
+    timer_pause(ULTRA_TIMER_GROUP, ULTRA_TIMER_INDEX);
 
-    // Escribir 0 en contador
-    TIMERG.hw_timer[TIMER_INDEX].load_high = 0;
-    TIMERG.hw_timer[TIMER_INDEX].load_low  = 0;
-    TIMERG.hw_timer[TIMER_INDEX].reload = 1;
+    // Poner contador en 0
+    timer_set_counter_value(ULTRA_TIMER_GROUP, ULTRA_TIMER_INDEX, 0);
 
-    // Reanudar conteo
-    TIMERG.hw_timer[TIMER_INDEX].config.enable = 1;
+    // Reanudar
+    timer_start(ULTRA_TIMER_GROUP, ULTRA_TIMER_INDEX);
 }
