@@ -1,41 +1,87 @@
-# ------ ESP-IDF / CMake / Ninja ------
-build/
-sdkconfig
-sdkconfig.old
-CMakeCache.txt
-CMakeFiles/
-cmake_install.cmake
-compile_commands.json
-*.cmake
+# ============================================================
+#   GITIGNORE PARA PROYECTOS ESP-IDF (OPTIMIZADO)
+#   Proyecto: ProyectoG2Micro
+#   Espressif ESP-IDF 5.x + CMake + Ninja
+# ============================================================
 
-# ------ Espressif tools ------
-.espressif/
-tools/
-dependencies.lock
+# -------------------------------
+# 1. Carpetas generadas por ESP-IDF
+# -------------------------------
+**/build/
+**/bootloader/
+**/partition_table/
+**/dependencies.lock
 
-# ------ Logs ------
-*.log
-*.tmp
-*.bak
+# -------------------------------
+# 2. Archivos CMake/Ninja generados
+# -------------------------------
+**/CMakeCache.txt
+**/CMakeFiles/
+**/cmake_install.cmake
+**/compile_commands.json
+**/*.cmake
+**/*.ninja
 
-# ------ Python envs ------
+# -------------------------------
+# 3. Archivos de configuración runtime
+# -------------------------------
+**/sdkconfig
+**/sdkconfig.old
+
+# -------------------------------
+# 4. Binaries generados (que NO se versionan)
+# -------------------------------
+**/*.bin
+**/*.elf
+**/*.map
+**/*.hex
+**/*.img
+**/*.pio
+
+# -------------------------------
+# 5. Archivos temporales / logs
+# -------------------------------
+**/*.log
+**/*.tmp
+**/*.bak
+
+# -------------------------------
+# 6. Python y __pycache__
+# -------------------------------
+**/__pycache__/
+**/*.pyc
+**/*.pyo
+**/*.pyd
+**/.mypy_cache/
+**/.python-version
 venv/
 env/
-*.pyc
-__pycache__/
 
-# ------ VS Code ------
+# -------------------------------
+# 7. VSCode / IDE basura
+# -------------------------------
 .vscode/
+**/.vscode/
 .settings/
 .idea/
+*.code-workspace
 
-# ------ Output binaries ------
-*.bin
-*.elf
-*.map
+# -------------------------------
+# 8. Sistemas operativos
+# -------------------------------
+.DS_Store
+Thumbs.db
 
-# ------ Misc ------
-*.orig
+# -------------------------------
+# 9. Windows basura
+# -------------------------------
 *.swp
 *.swo
-.DS_Store
+*.orig
+
+# -------------------------------
+# 10. Espressif SDK tools
+# -------------------------------
+.espressif/
+tools/
+dist/
