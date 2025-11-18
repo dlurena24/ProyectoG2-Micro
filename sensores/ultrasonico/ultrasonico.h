@@ -9,7 +9,7 @@ extern "C" {
 
 // pines
 #define GPIO_TRIG 5
-#define GPIO 18
+#define GPIO_ECHO 18
 
 // inicializa el modulo
 void ultrasonico_init(void);

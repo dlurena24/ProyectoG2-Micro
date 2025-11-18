@@ -17,6 +17,9 @@
   ],
   "C_Cpp.errorSquiggles": "enabled",
   "files.associations": {
-    "timer_group_reg.h": "c"
+    "timer_group_reg.h": "c",
+    "ultrasonico_isr.h": "c",
+    "gpio.h": "c",
+    "ultrasonico_timer.h": "c"
   }
 }
