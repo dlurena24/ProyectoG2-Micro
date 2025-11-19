@@ -48,7 +48,7 @@ uint64_t ultrasonico_medicion_raw(void)
 
     // genera pulso en TRIG
     gpio_set_level(GPIO_TRIG, 1);
-    ets_delay_us(10);
+    esp_rom_delay_us(10);
     gpio_set_level(GPIO_TRIG, 0);
 
     // espera ECHO en el rango definido

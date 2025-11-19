@@ -8,4 +8,5 @@ idf_component_register(
     REQUIRES
         driver
         esp_common
+        esp_rom
 )
