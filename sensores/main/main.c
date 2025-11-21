@@ -4,7 +4,6 @@
 
 #include "ultrasonico.h"
 
-
 void app_main(void)
 {
     ultrasonico_init();

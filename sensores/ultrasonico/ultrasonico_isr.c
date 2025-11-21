@@ -14,10 +14,10 @@ static void IRAM_ATTR ultrasonico_echo_isr(void *arg)
     int level = gpio_get_level(GPIO_ECHO);
 
     if (level == 1) {
-        // flanco de subida: ECHO pasó a 1
+        // subida
         echo_rise_us = ultrasonico_timer_get_us();
     } else {
-        // flanco de bajada: ECHO pasó a 0
+        // bajada
         echo_fall_us = ultrasonico_timer_get_us();
     }
 }
@@ -34,9 +34,9 @@ void ultrasonico_isr_init(void)
 
     gpio_config(&cfg);
 
-    // instala servicio de ISR si no existe aún
+    // instala servicio de ISR
     gpio_install_isr_service(0);
 
-    // registra la ISR para el pin ECHO
+    // registra ISR para ECHO
     gpio_isr_handler_add(GPIO_ECHO, ultrasonico_echo_isr, NULL);
 }
