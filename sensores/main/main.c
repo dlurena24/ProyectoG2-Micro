@@ -63,14 +63,27 @@ static int readDistance()
 
 static float readAccelerometer(void)
 {
-    // Reemplazar con lectura real I2C
-    float accel = 0.5f;
+    float ax, ay, az;
+
+    // Leer valores del acelerómetro en G
+    esp_err_t ret = acelerometro_leer_g(&ax, &ay, &az);
+    if (ret != ESP_OK) {
+        emitEvent("acceleration_error", "I2C read failed");
+        return 0.0f;
+    }
+
+    // Magnitud en G
+    float mag_g = acelerometro_magnitud(ax, ay, az);
+
+    // Convertir G → m/s^2
+    float mag_ms2 = mag_g * 9.80665f;
 
     char buffer[64];
-    snprintf(buffer, sizeof(buffer), "Acceleration: %.2f m/s^2", accel);
+    snprintf(buffer, sizeof(buffer),
+             "Accel: %.2f m/s^2", mag_ms2);
     emitEvent("acceleration", buffer);
 
-    return accel;
+    return mag_ms2;
 }
 
 // =======================
