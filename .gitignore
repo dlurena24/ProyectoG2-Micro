@@ -1,0 +1,87 @@
+# ============================================================
+#   GITIGNORE PARA PROYECTOS ESP-IDF (OPTIMIZADO)
+#   Proyecto: ProyectoG2Micro
+#   Espressif ESP-IDF 5.x + CMake + Ninja
+# ============================================================
+
+# -------------------------------
+# 1. Carpetas generadas por ESP-IDF
+# -------------------------------
+**/build/
+**/bootloader/
+**/partition_table/
+**/dependencies.lock
+
+# -------------------------------
+# 2. Archivos CMake/Ninja generados
+# -------------------------------
+**/CMakeCache.txt
+**/CMakeFiles/
+**/cmake_install.cmake
+**/compile_commands.json
+**/*.cmake
+**/*.ninja
+
+# -------------------------------
+# 3. Archivos de configuración runtime
+# -------------------------------
+**/sdkconfig
+**/sdkconfig.old
+
+# -------------------------------
+# 4. Binaries generados (que NO se versionan)
+# -------------------------------
+**/*.bin
+**/*.elf
+**/*.map
+**/*.hex
+**/*.img
+**/*.pio
+
+# -------------------------------
+# 5. Archivos temporales / logs
+# -------------------------------
+**/*.log
+**/*.tmp
+**/*.bak
+
+# -------------------------------
+# 6. Python y __pycache__
+# -------------------------------
+**/__pycache__/
+**/*.pyc
+**/*.pyo
+**/*.pyd
+**/.mypy_cache/
+**/.python-version
+venv/
+env/
+
+# -------------------------------
+# 7. VSCode / IDE basura
+# -------------------------------
+.vscode/
+**/.vscode/
+.settings/
+.idea/
+*.code-workspace
+
+# -------------------------------
+# 8. Sistemas operativos
+# -------------------------------
+.DS_Store
+Thumbs.db
+
+# -------------------------------
+# 9. Windows basura
+# -------------------------------
+*.swp
+*.swo
+*.orig
+
+# -------------------------------
+# 10. Espressif SDK tools
+# -------------------------------
+.espressif/
+tools/
+dist/
