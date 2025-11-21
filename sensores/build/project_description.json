@@ -1,7 +1,7 @@
 {
     "version":            "1.2",
     "project_name":       "sensores",
-    "project_version":    "a8c782c-dirty",
+    "project_version":    "0d17168-dirty",
     "project_path":       "C:/Users/mavic/Documents/ProyectoG2-Micro/sensores",
     "idf_path":           "C:/Users/mavic/esp/v5.2/esp-idf",
     "build_dir":          "C:/Users/mavic/Documents/ProyectoG2-Micro/sensores/build",
