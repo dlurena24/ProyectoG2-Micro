@@ -1,0 +1,60 @@
+# =========================================
+# ESP-IDF BUILD FILES (NO SUBIR)
+# =========================================
+
+# Carpeta de compilación
+/build/
+sdkconfig
+sdkconfig.old
+sdkconfig.defaults
+
+# Archivos generados por CMake
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+Makefile
+
+# Archivos de depuración
+*.elf
+*.bin
+*.map
+*.lst
+*.lss
+
+# Archivos generados por ESP-IDF idf.py
+flash_project_args
+flash_args
+idf_exe_git_desc.txt
+
+# Logs
+*.log
+
+# =========================================
+# VS CODE CONFIG (Opcional)
+# =========================================
+
+# Puedes ignorar TODA la carpeta .vscode
+# si tu equipo genera automáticamente settings.
+# RECOMENDADO
+.vscode/
+
+# Si quieres subir algunos archivos, ignora solo:
+# .vscode/ipch
+# .vscode/clangd
+# .vscode/settings.json   <-- normalmente NO se sube
+
+# =========================================
+# ARCHIVOS TEMPORALES DEL SISTEMA
+# =========================================
+
+# Linux
+*.swp
+*.swo
+*~
+
+# MacOS
+.DS_Store
+
+# Python virtual env
+venv/
+.env/
