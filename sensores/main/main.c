@@ -175,6 +175,7 @@ void app_main(void)
     ESP_LOGI("SYSTEM", "Automatic door system started.");
 
     ultrasonico_init();
+    acelerometro_init();
 
     xTaskCreate(door_task, "door_task", 4096, NULL, 5, NULL);
 }
