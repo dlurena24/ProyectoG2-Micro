@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <string.h>
+#include <math.h>
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "esp_log.h"
@@ -177,7 +178,7 @@ static void door_task(void *arg)
 
         // ---- READ ACCELEROMETER ----
         float accel = readAccelerometer();
-        float delta = fabs(accel - baselineAccel);
+        float delta = fabsf(accel - baselineAccel);
         if (delta >= impactThreshold) {
             emitEvent("impact", "Impact detected");
             handleImpact();
