@@ -5,8 +5,9 @@ idf_component_register(
         "ultrasonico_timer.c"
     INCLUDE_DIRS
         "."
-    REQUIRES
-        driver
+    PRIV_REQUIRES
+        esp_driver_gpio
+        esp_driver_gptimer
         esp_common
         esp_rom
 )

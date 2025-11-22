@@ -1,48 +1,42 @@
 #include "ultrasonico_timer.h"
-#include "driver/timer.h"
+#include "driver/gptimer.h"
 
-#define ULTRA_TIMER_GROUP   TIMER_GROUP_0
-#define ULTRA_TIMER_INDEX   TIMER_0
-
-// 80 MHz
-#define ULTRA_TIMER_DIVIDER 80
+static gptimer_handle_t ultra_timer = NULL;
 
 void ultrasonico_timer_init(void)
 {
-    timer_config_t config = {
-        .divider = ULTRA_TIMER_DIVIDER,
-        .counter_dir = TIMER_COUNT_UP,
-        .counter_en = TIMER_PAUSE,
-        .alarm_en = TIMER_ALARM_DIS,
-        .auto_reload = false,
+    // Configurar GPTimer con resolución de 1 MHz = 1 us por tick
+    gptimer_config_t config = {
+        .clk_src = GPTIMER_CLK_SRC_DEFAULT,
+        .direction = GPTIMER_COUNT_UP,
+        .resolution_hz = 1000000,   // 1 tick = 1 microsegundo
     };
 
-    // configurar timer
-    timer_init(ULTRA_TIMER_GROUP, ULTRA_TIMER_INDEX, &config);
+    ESP_ERROR_CHECK(gptimer_new_timer(&config, &ultra_timer));
+    ESP_ERROR_CHECK(gptimer_enable(ultra_timer));
 
-    // contador en 0
-    timer_set_counter_value(ULTRA_TIMER_GROUP, ULTRA_TIMER_INDEX, 0);
+    // Poner en cero
+    ESP_ERROR_CHECK(gptimer_set_raw_count(ultra_timer, 0));
 
-    // iniciar conteo
-    timer_start(ULTRA_TIMER_GROUP, ULTRA_TIMER_INDEX);
+    // Arrancar
+    ESP_ERROR_CHECK(gptimer_start(ultra_timer));
 }
 
 uint64_t ultrasonico_timer_get_us(void)
 {
     uint64_t value = 0;
-    timer_get_counter_value(ULTRA_TIMER_GROUP, ULTRA_TIMER_INDEX, &value);
-    // Con divisor 80, cada tick = 1 us
-    return value;
+    ESP_ERROR_CHECK(gptimer_get_raw_count(ultra_timer, &value));
+    return value;   // ya son microsegundos
 }
 
 void ultrasonico_timer_reset(void)
 {
     // Pausar
-    timer_pause(ULTRA_TIMER_GROUP, ULTRA_TIMER_INDEX);
+    ESP_ERROR_CHECK(gptimer_stop(ultra_timer));
 
-    // Poner contador en 0
-    timer_set_counter_value(ULTRA_TIMER_GROUP, ULTRA_TIMER_INDEX, 0);
+    // Reset a 0
+    ESP_ERROR_CHECK(gptimer_set_raw_count(ultra_timer, 0));
 
     // Reanudar
-    timer_start(ULTRA_TIMER_GROUP, ULTRA_TIMER_INDEX);
+    ESP_ERROR_CHECK(gptimer_start(ultra_timer));
 }
