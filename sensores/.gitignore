@@ -1,60 +1,70 @@
-# =========================================
-# ESP-IDF BUILD FILES (NO SUBIR)
-# =========================================
+##############################################
+# ESP-IDF PROJECT IGNORE FILE
+# Proyecto: sensores
+##############################################
 
-# Carpeta de compilación
-/build/
-sdkconfig
-sdkconfig.old
-sdkconfig.defaults
-
-# Archivos generados por CMake
+# -------------------------
+# BUILD SYSTEM (NO SUBIR)
+# -------------------------
+build/
 CMakeCache.txt
 CMakeFiles/
 cmake_install.cmake
 Makefile
 
-# Archivos de depuración
+# sdkconfig (solo para tu PC)
+sdkconfig
+sdkconfig.old
+
+# Args generados por el flasher
+flash_args
+flash_project_args
+idf_exe_git_desc.txt
+
+# -------------------------
+# BINARIOS GENERADOS
+# -------------------------
 *.elf
 *.bin
 *.map
 *.lst
 *.lss
 
-# Archivos generados por ESP-IDF idf.py
-flash_project_args
-flash_args
-idf_exe_git_desc.txt
-
-# Logs
+# -------------------------
+# LOGS
+# -------------------------
 *.log
 
-# =========================================
-# VS CODE CONFIG (Opcional)
-# =========================================
+# -------------------------
+# PYTHON VENV
+# -------------------------
+venv/
+.env/
+python_env/
+*.pyc
+__pycache__/
 
-# Puedes ignorar TODA la carpeta .vscode
-# si tu equipo genera automáticamente settings.
-# RECOMENDADO
+# -------------------------
+# VS CODE (USO PERSONAL)
+# -------------------------
+# Se recomienda NO subir configuraciones dependientes del equipo
 .vscode/
 
-# Si quieres subir algunos archivos, ignora solo:
-# .vscode/ipch
-# .vscode/clangd
-# .vscode/settings.json   <-- normalmente NO se sube
+# Si deseas subir extensiones opcionalmente, borra .vscode/
+# y agrega solo:
+# .vscode/extensions.json
 
-# =========================================
-# ARCHIVOS TEMPORALES DEL SISTEMA
-# =========================================
+# -------------------------
+# SISTEMA OPERATIVO / TEMPORALES
+# -------------------------
 
 # Linux
+*~
 *.swp
 *.swo
-*~
 
 # MacOS
 .DS_Store
 
-# Python virtual env
-venv/
-.env/
+# Windows
+Thumbs.db
