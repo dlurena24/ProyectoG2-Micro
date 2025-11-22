@@ -1,4 +1,4 @@
-#ifndef ULRTASONICO_H
+#ifndef ULTRASONICO_H
 #define ULTRASONICO_H
 
 #include <stdint.h>

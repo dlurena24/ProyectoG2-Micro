@@ -28,6 +28,8 @@ typedef enum {
 static DoorState doorState = STOPPED;
 static uint64_t lastPresenceTime = 0;
 
+static float baselineAccel = 9.8f;
+
 uint64_t millis()
 {
     return (uint64_t)xTaskGetTickCount() * portTICK_PERIOD_MS;
@@ -41,6 +43,34 @@ static void emitEvent(const char* eventType, const char* message)
 {
     ESP_LOGI("EVENT", "{ \"event\": \"%s\", \"message\": \"%s\", \"timestamp\": %llu }",
              eventType, message, millis());
+}
+
+// =======================
+// ACCELEROMETER CALIBRATION
+// =======================
+
+static void calibrate_accelerometer(void)
+{
+    ESP_LOGI("CALIB", "Calibrating accelerometer...");
+
+    float sum = 0;
+    const int samples = 60;
+
+    for (int i = 0; i < samples; i++) {
+        float ax, ay, az;
+        esp_err_t ret = acelerometro_leer_g(&ax, &ay, &az);
+
+        if (ret == ESP_OK) {
+            float mag = acelerometro_magnitud(ax, ay, az) * 9.80665f;
+            sum += mag;
+        }
+
+        vTaskDelay(pdMS_TO_TICKS(20));
+    }
+
+    baselineAccel = sum / samples;
+
+    ESP_LOGI("CALIB", "Baseline acceleration = %.3f m/s²", baselineAccel);
 }
 
 // =======================
@@ -69,7 +99,7 @@ static float readAccelerometer(void)
     esp_err_t ret = acelerometro_leer_g(&ax, &ay, &az);
     if (ret != ESP_OK) {
         emitEvent("acceleration_error", "I2C read failed");
-        return 0.0f;
+        return baselineAccel;
     }
 
     // Magnitud en G
@@ -147,7 +177,8 @@ static void door_task(void *arg)
 
         // ---- READ ACCELEROMETER ----
         float accel = readAccelerometer();
-        if (accel >= impactThreshold) {
+        float delta = fabs(accel - baselineAccel);
+        if (delta >= impactThreshold) {
             emitEvent("impact", "Impact detected");
             handleImpact();
         }
@@ -176,6 +207,8 @@ void app_main(void)
 
     ultrasonico_init();
     acelerometro_init();
+
+    calibrate_accelerometer();
 
     xTaskCreate(door_task, "door_task", 4096, NULL, 5, NULL);
 }

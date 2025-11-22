@@ -13,7 +13,7 @@ extern "C" {
 
 // pines para I2C
 #define I2C_SDA_PIN     21
-#define I2C_SCL_PIN     22
+#define I2C_SCL_PIN     47
 
 // puerto
 #define I2C_PORT        I2C_NUM_0
