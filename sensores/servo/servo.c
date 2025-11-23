@@ -29,7 +29,7 @@ void servo_init(int gpio)
         .gpio_num = gpio,
         .clk_src = RMT_CLK_SRC_DEFAULT,
         .mem_block_symbols = 64,
-        .resolution_hz = 1000000, // 1 MHz → 1 tick por microsegundo
+        .resolution_hz = 1000000,       // 1 MHz
         .trans_queue_depth = 4,
     };
     rmt_new_tx_channel(&tx_cfg, &tx_channel);
@@ -37,7 +37,7 @@ void servo_init(int gpio)
     rmt_pwm_encoder_config_t enc_cfg = {
         .resolution = 1000000, // 1 MHz
         .freq_hz = SERVO_FREQ_HZ,
-        .duty_cycle = 0.05, // placeholder, se cambia dinámicamente
+        .duty_cycle = 0.05,             // placeholder
     };
 
     rmt_new_pwm_encoder(&enc_cfg, &pwm_encoder);
@@ -59,12 +59,42 @@ void servo_set_angle(float degrees)
     ESP_LOGI(TAG, "Ángulo %.1f° → %dus", degrees, pulse);
 }
 
-void servo_open(void)
-{ 
-    servo_set_angle(120);   // placeholder antes de prueba fisica
+void servo_move_smooth(float start_deg, float end_deg, float step_deg, int step_delay_ms)
+{
+    if (step_deg <= 0) step_deg = 1;
+
+    float pos = start_deg;
+
+    if (end_deg > start_deg)
+    {
+        // ascendente
+        for (pos = start_deg; pos <= end_deg; pos += step_deg)
+        {
+            servo_set_angle(pos);
+            vTaskDelay(pdMS_TO_TICKS(step_delay_ms));
+        }
+    }
+    else
+    {
+        // descendente
+        for (pos = start_deg; pos >= end_deg; pos -= step_deg)
+        {
+            servo_set_angle(pos);
+            vTaskDelay(pdMS_TO_TICKS(step_delay_ms));
+        }
+    }
+
+    // posición final
+    servo_set_angle(end_deg);
 }
 
-void servo_close(void)      // placeholder antes de prueba   
+
+void servo_open(void)
 { 
-    servo_set_angle(0); 
+    servo_move_smooth(0, 120, 2, 15);   // placeholder antes de prueba fisica
+}
+
+void servo_close(void)      
+{
+    servo_move_smooth(120, 0, 2, 15);   // placeholder antes de prueba   
 }
