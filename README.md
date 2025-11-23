@@ -50,7 +50,7 @@ Sistema de automatización de puertas que combina detección inteligente de pres
 | 4 | **Servomotor 180°** | 3,7 - 7,2Vcc 20mA, 10 Kgf/cm, Velocidad <0,16 s | 1 |
 | 5 | **Batería 9V** |  | 1 |
 | 6 | **Placa Perforada** | Tamaño 76 x 125 mm | 1 |
-| 7 | **Filamento PCA** | Para impresiones 3D de los rieles del prototipo | 1 |
+| 7 | **Filamento PLA+** | Para impresiones 3D de los rieles del prototipo | 1 |
 | 8 | **Lámina Cartofoam** | Tamaño 82 x 102 cm | 1 |
 
 ---
