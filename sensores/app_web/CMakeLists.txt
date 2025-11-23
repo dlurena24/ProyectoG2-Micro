@@ -4,6 +4,7 @@ idf_component_register(
     INCLUDE_DIRS
         "."
     PRIV_REQUIRES
+        servo
         driver
         esp_http_server
         nvs_flash

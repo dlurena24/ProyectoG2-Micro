@@ -11,13 +11,13 @@
 #include <sys/param.h>
 #include <time.h>
 #include "mbedtls/base64.h"
+#include "servo.h"
 
 #define WIFI_SSID      "K2300PT"
 #define WIFI_PASS      "Chocolate-2307"
 #define HTTP_AUTH_USERNAME "admin"
 #define HTTP_AUTH_PASSWORD "akmc23"
 #define LOG_CAPACITY 25
-#define DOOR_PIN       18
 
 static const char *TAG = "web-door";
 static bool door_open = false;
@@ -240,11 +240,9 @@ esp_err_t config_set_handler(httpd_req_t *req) {
     if (state_ptr) {
         char *value = state_ptr + 6;
         if (strncmp(value, "OPEN", 4) == 0) {
-            gpio_set_level(DOOR_PIN, 1);
             door_open = true;
             httpd_resp_sendstr(req, "Estado inicial aplicado: OPEN");
         } else if (strncmp(value, "CLOSED", 6) == 0) {
-            gpio_set_level(DOOR_PIN, 0);
             door_open = false;
             httpd_resp_sendstr(req, "Estado inicial aplicado: CLOSED");
         } else {
@@ -265,7 +263,7 @@ esp_err_t door_state_handler(httpd_req_t *req) {
 }
 
 esp_err_t door_open_handler(httpd_req_t *req) {
-    gpio_set_level(DOOR_PIN, 1); // HIGH
+    servo_open(); // HIGH
     door_open = true;
     last_action = esp_log_timestamp();
     add_log_event(true);
@@ -274,7 +272,7 @@ esp_err_t door_open_handler(httpd_req_t *req) {
 }
 
 esp_err_t door_close_handler(httpd_req_t *req) {
-    gpio_set_level(DOOR_PIN, 0); // LOW
+    servo_close(); // LOW
     door_open = false;
     last_action = esp_log_timestamp();
     add_log_event(false);
@@ -306,27 +304,19 @@ httpd_handle_t start_webserver(void) {
 
 void app_web_init(void) {
     ESP_ERROR_CHECK(nvs_flash_init());
-    gpio_config_t io_conf = {
-        .pin_bit_mask = 1ULL << DOOR_PIN,
-        .mode = GPIO_MODE_OUTPUT,
-        .pull_up_en = 0,
-        .pull_down_en = 0,
-        .intr_type = GPIO_INTR_DISABLE
-    };
-    gpio_config(&io_conf);
 
     wifi_init_sta();
 
     ESP_LOGI(TAG, "Esperando conexión WiFi...");
     vTaskDelay(5000 / portTICK_PERIOD_MS);
 
+    servo_init(18);
     start_webserver();
     ESP_LOGI(TAG, "Servidor HTTP iniciado");
     // NO bucle infinito aquí; el main() será quien gestione el ciclo de la app
 }
 
 void actualizar_puerta_a_abierta(void) {
-    gpio_set_level(DOOR_PIN, 1); // HIGH
     door_open = true;
     last_action = esp_log_timestamp();
     add_log_event(true);  // true = abierta
@@ -334,7 +324,6 @@ void actualizar_puerta_a_abierta(void) {
 }
 
 void actualizar_puerta_a_cerrada(void) {
-    gpio_set_level(DOOR_PIN, 0); // LOW
     door_open = false;
     last_action = esp_log_timestamp();
     add_log_event(false); // false = cerrada
