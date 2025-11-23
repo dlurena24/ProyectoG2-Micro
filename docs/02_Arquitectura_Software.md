@@ -54,7 +54,8 @@ Eventos:
 ---
 
 ## 3. Diagrama de Flujo del Programa Principal
-<img width="1543" height="1050" alt="DiagramaArquiSoft" src="https://github.com/user-attachments/assets/e0da2ec3-8c7b-40bf-a5ca-a8aecf8041e9" />
+<img width="1544" height="937" alt="DiagramaArquiSoft (2)" src="https://github.com/user-attachments/assets/cd823f6a-5bac-418a-9ea6-6a4c6a8bf62b" />
+
 
 ---
 
