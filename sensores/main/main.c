@@ -188,7 +188,7 @@ void app_main(void)
 {
     ESP_LOGI("SYSTEM", "Automatic door system started.");
 
-    servo_init(4); 
+    servo_init(18); 
     ultrasonico_init();
     acelerometro_init();
 
