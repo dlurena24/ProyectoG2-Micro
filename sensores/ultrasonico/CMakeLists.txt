@@ -6,8 +6,7 @@ idf_component_register(
     INCLUDE_DIRS
         "."
     PRIV_REQUIRES
-        esp_driver_gpio
-        esp_driver_gptimer
+        driver
         esp_common
         esp_rom
 )
