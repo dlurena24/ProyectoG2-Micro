@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
+
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "esp_log.h"
@@ -9,7 +10,7 @@
 #include "acelerometro.h"
 #include "servo.h"
 
-// DOOR PARAMS=
+// DOOR PARAMS
 static const int distanceToOpen = 30;                 // cm
 static const uint64_t timeToWaitForClose = 3000;      // ms
 static const float impactThreshold = 2.5f;            // m/s^2
@@ -23,7 +24,6 @@ typedef enum {
 
 static DoorState doorState = STOPPED;
 static uint64_t lastPresenceTime = 0;
-
 static float baselineAccel = 9.8f;
 
 uint64_t millis()
@@ -161,6 +161,7 @@ static void door_task(void *arg)
         // ---- READ ACCELEROMETER ----
         float accel = readAccelerometer();
         float delta = fabsf(accel - baselineAccel);
+
         if (delta >= impactThreshold) {
             emitEvent("impact", "Impact detected");
             handleImpact();
