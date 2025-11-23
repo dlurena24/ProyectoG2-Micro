@@ -54,6 +54,7 @@ Eventos:
 ---
 
 ## 3. Diagrama de Flujo del Programa Principal
+<img width="1543" height="1050" alt="DiagramaArquiSoft" src="https://github.com/user-attachments/assets/e0da2ec3-8c7b-40bf-a5ca-a8aecf8041e9" />
 
 ---
 
@@ -70,12 +71,12 @@ Eventos:
 
 ## 5. Organización de Memoria
 
-### ✔ RAM
+### RAM
 - Tareas FreeRTOS → stacks de 4 KB  
 - Buffers de I2C, lecturas y logs → <1 KB  
 - Servidor HTTP → ~30-40 KB  
 
-### ✔ Flash
+### Flash
 - Firmware C  
 - Páginas HTML embebidas  
 - NVS para configuraciones
@@ -91,3 +92,6 @@ Cada lectura genera:
   "message": "...",
   "timestamp": <ms>
 }
+```
+
+La WebApp almacena un buffer FIFO de últimos 25 eventos.
