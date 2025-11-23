@@ -8,18 +8,12 @@
 #include "ultrasonico.h"
 #include "acelerometro.h"
 
-// =======================
-// DOOR PARAMS
-// =======================
-
+// DOOR PARAMS=
 static const int distanceToOpen = 30;                 // cm
 static const uint64_t timeToWaitForClose = 3000;      // ms
 static const float impactThreshold = 2.5f;            // m/s^2
 
-// =======================
 // DOOR STATE
-// =======================
-
 typedef enum {
     STOPPED,
     OPENING,
@@ -36,20 +30,14 @@ uint64_t millis()
     return (uint64_t)xTaskGetTickCount() * portTICK_PERIOD_MS;
 }
 
-// =======================
 // EVENT SYSTEM
-// =======================
-
 static void emitEvent(const char* eventType, const char* message)
 {
     ESP_LOGI("EVENT", "{ \"event\": \"%s\", \"message\": \"%s\", \"timestamp\": %llu }",
              eventType, message, millis());
 }
 
-// =======================
 // ACCELEROMETER CALIBRATION
-// =======================
-
 static void calibrate_accelerometer(void)
 {
     ESP_LOGI("CALIB", "Calibrating accelerometer...");
@@ -74,10 +62,7 @@ static void calibrate_accelerometer(void)
     ESP_LOGI("CALIB", "Baseline acceleration = %.3f m/s²", baselineAccel);
 }
 
-// =======================
 // SENSOR READING
-// =======================
-
 static int readDistance()
 {
     float pulse_us = ultrasonico_medicion_raw();
@@ -117,10 +102,7 @@ static float readAccelerometer(void)
     return mag_ms2;
 }
 
-// =======================
 // DOOR ACTIONS
-// =======================
-
 static void openDoor(void)
 {
     if (doorState == OPENING) return;
@@ -168,10 +150,7 @@ static void handleImpact(void)
     }
 }
 
-// =======================
 // MAIN CONTROL TASK
-// =======================
-
 static void door_task(void *arg)
 {
     while (1) {
