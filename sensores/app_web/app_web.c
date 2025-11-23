@@ -47,7 +47,7 @@ static const char *html_form =
 "<a href=\"/logs\"><button class='btn'>Ver historial</button></a>"
 "<script>function updateEstado(){fetch('/door/state').then(res=>res.text()).then(t=>{document.getElementById('estado').textContent=t;});}"
 "function activarPuerta(accion){fetch('/door/'+accion).then(()=>updateEstado());}"
-"window.onload=updateEstado;</script></body></html>";
+"window.onload=function() {updateEstado();setInterval(updateEstado, 1000);};</script></body></html>";
 
 const char *htmlConfigPage =
 "<!DOCTYPE html><html><head>"
@@ -323,4 +323,20 @@ void app_web_init(void) {
     start_webserver();
     ESP_LOGI(TAG, "Servidor HTTP iniciado");
     // NO bucle infinito aquí; el main() será quien gestione el ciclo de la app
+}
+
+void actualizar_puerta_a_abierta(void) {
+    gpio_set_level(DOOR_PIN, 1); // HIGH
+    door_open = true;
+    last_action = esp_log_timestamp();
+    add_log_event(true);  // true = abierta
+    ESP_LOGI(TAG, "Puerta actualizada a ABIERTA (via función)");
+}
+
+void actualizar_puerta_a_cerrada(void) {
+    gpio_set_level(DOOR_PIN, 0); // LOW
+    door_open = false;
+    last_action = esp_log_timestamp();
+    add_log_event(false); // false = cerrada
+    ESP_LOGI(TAG, "Puerta actualizada a CERRADA (via función)");
 }

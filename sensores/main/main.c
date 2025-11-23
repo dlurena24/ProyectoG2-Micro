@@ -8,6 +8,7 @@
 #include "ultrasonico.h"
 #include "acelerometro.h"
 #include "servo.h"
+#include "app_web.h"
 
 // DOOR PARAMS
 static const int distanceToOpen = 30;                 // cm
@@ -170,6 +171,7 @@ static void door_task(void *arg)
         int distance = readDistance();
         if (distance <= distanceToOpen) {
             openDoor();
+            actualizar_puerta_a_abierta();
             lastPresenceTime = millis();
         }
 
@@ -178,6 +180,7 @@ static void door_task(void *arg)
             (millis() - lastPresenceTime > timeToWaitForClose))
         {
             closeDoor();
+            actualizar_puerta_a_cerrada();
         }
 
         vTaskDelay(pdMS_TO_TICKS(100));
@@ -186,13 +189,15 @@ static void door_task(void *arg)
 
 void app_main(void)
 {
+    app_web_init();
     ESP_LOGI("SYSTEM", "Automatic door system started.");
 
-    servo_init(4); 
+    servo_init(18); 
     ultrasonico_init();
     acelerometro_init();
 
     calibrate_accelerometer();
 
     xTaskCreate(door_task, "door_task", 4096, NULL, 5, NULL);
+    
 }
