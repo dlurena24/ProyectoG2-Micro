@@ -12,8 +12,8 @@ extern "C" {
 #define MPU6050_ADDR    0x68
 
 // pines para I2C
-#define I2C_SDA_PIN     21
-#define I2C_SCL_PIN     47
+#define I2C_SDA_PIN     5
+#define I2C_SCL_PIN     4
 
 // puerto
 #define I2C_PORT        I2C_NUM_0
