@@ -7,6 +7,7 @@
 
 #include "ultrasonico.h"
 #include "acelerometro.h"
+#include "servo.h"
 
 // DOOR PARAMS=
 static const int distanceToOpen = 30;                 // cm
@@ -108,7 +109,8 @@ static void openDoor(void)
     if (doorState == OPENING) return;
 
     emitEvent("door_action", "Opening door");
-    // TODO mover servo
+    
+    servo_open();
 
     doorState = OPENING;
 }
@@ -118,7 +120,8 @@ static void closeDoor(void)
     if (doorState == CLOSING) return;
 
     emitEvent("door_action", "Closing door");
-    // TODO mover servo
+    
+    servo_close();
 
     doorState = CLOSING;
 }
@@ -126,7 +129,6 @@ static void closeDoor(void)
 static void stopDoor(void)
 {
     emitEvent("door_action", "Door stopped");
-    // TODO parar motor
 
     doorState = STOPPED;
 }
@@ -134,8 +136,9 @@ static void stopDoor(void)
 static void forceOpenDoor(void)
 {
     emitEvent("door_action", "Force opening door");
-    // TODO mover servo en apertura
 
+    servo_open();
+    
     doorState = OPENING;
 }
 
@@ -185,6 +188,7 @@ void app_main(void)
 {
     ESP_LOGI("SYSTEM", "Automatic door system started.");
 
+    servo_init(4); 
     ultrasonico_init();
     acelerometro_init();
 

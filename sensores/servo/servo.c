@@ -39,7 +39,7 @@ void servo_init(int gpio)
         .freq_hz = SERVO_FREQ_HZ,
         .duty_cycle = 0.05, // placeholder, se cambia dinámicamente
     };
-    
+
     rmt_new_pwm_encoder(&enc_cfg, &pwm_encoder);
 
     rmt_enable(tx_channel);
@@ -59,5 +59,12 @@ void servo_set_angle(float degrees)
     ESP_LOGI(TAG, "Ángulo %.1f° → %dus", degrees, pulse);
 }
 
-void servo_open(void)  { servo_set_angle(120); }
-void servo_close(void) { servo_set_angle(0); }
+void servo_open(void)
+{ 
+    servo_set_angle(120);   // placeholder antes de prueba fisica
+}
+
+void servo_close(void)      // placeholder antes de prueba   
+{ 
+    servo_set_angle(0); 
+}
