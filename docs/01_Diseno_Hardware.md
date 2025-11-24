@@ -171,8 +171,16 @@ Fuente usada: 5V / 2.5A → suficiente para picos del servomotor.
 
 ## 6. Consideraciones de Diseño Mecánico
 
-- El servo mueve la puerta mediante un piñon y una cremallera diseñados e impresos en 3D con filamento PCA.
-- La estructura se fabricó con cartofoam y perfiles impresos en PLA+.
-- Se eligió un ángulo máximo de 180° para proteger engranajes.
+- El servo mueve la puerta mediante un piñon y una cremallera diseñados e impresos en 3D con filamento PCA+
+  
+![1](https://github.com/user-attachments/assets/e2426f70-59ba-47fb-be75-bb9f133bd07a)
+
+- La estructura de las puertas se fabricó con cartofoam, dado a que de hacerlo por impresión 3D habría necesitado de demasiado material y seria muy pesado
+- Para soporte de las puertas se utilizó madera de balsa debido a sus ventajas de ser bastante rígido y a la vez ser muy ligero
+- Se eligió que el servo se moviera un ángulo máximo de 180° para desplazar el sistema y abrir la puerta por completo
+- También para los soportes de todo el sistema se eligi{o el uso de bloques LEGO, dado a que permiten bastante posibilidad de variaciones de diseño en el momento de implementar el prototipo
+- Se montó el sensor ultrasónico directamente en la entrada de la puerta y se calibró para que sólo pudiera detectar objetos que estuviera justamente en esa area, además tambien se monto el acelerómetro directamente encima de la puerta.
+  
+ ![2](https://github.com/user-attachments/assets/2d1b2d8c-75c1-44a0-97ef-cb086d84a1d1)
 
 ---
