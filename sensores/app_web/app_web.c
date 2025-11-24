@@ -13,6 +13,10 @@
 #include "mbedtls/base64.h"
 #include "servo.h"
 
+
+/**
+ * @brief Definicion de todas las variables importantes que son consideradas constantes
+ */
 #define WIFI_SSID      "Kendall2300"
 #define WIFI_PASS      "chocolate270"
 #define HTTP_AUTH_USERNAME "admin"
@@ -23,6 +27,9 @@ static const char *TAG = "web-door";
 static bool door_open = false;
 static unsigned long last_action = 0;
 
+/**
+ * @brief Struct que se utiliza para poder llevar a cabo el registro de los logs
+ */
 typedef struct {
     time_t timestamp;
     bool door_state;
@@ -33,7 +40,9 @@ static int log_count = 0;
 
 static char html[4000];
 
-
+/**
+ * @brief Codigo de la pagina principal de la aplicacion con sus funciones en javascript
+ */
 static const char *html_form =
 "<!DOCTYPE html><html><head>"
 "<meta name='viewport' content='width=device-width, initial-scale=1.0'>"
@@ -49,6 +58,9 @@ static const char *html_form =
 "function activarPuerta(accion){fetch('/door/'+accion).then(()=>updateEstado());}"
 "window.onload=function() {updateEstado();setInterval(updateEstado, 1000);};</script></body></html>";
 
+/**
+ * @brief Codigo de la pagina configuracion de la aplicacion con sus funciones en javascript
+ */
 const char *htmlConfigPage =
 "<!DOCTYPE html><html><head>"
 "<meta name='viewport' content='width=device-width, initial-scale=1.0'>"
@@ -91,7 +103,14 @@ const char *htmlConfigPage =
 "</body></html>";
 
 
-/* WiFi event handler */
+/**
+ * @brief Metodo que se encarga de manejar la conexion del Wi-Fi
+ * 
+ * @param arg 
+ * @param event_base 
+ * @param event_id 
+ * @param event_data 
+ */
 static void wifi_event_handler(void* arg, esp_event_base_t event_base,
                               int32_t event_id, void* event_data) {
     if (event_id == WIFI_EVENT_STA_START) {
@@ -102,7 +121,11 @@ static void wifi_event_handler(void* arg, esp_event_base_t event_base,
     }
 }
 
-/*Handler log event*/
+/**
+ * @brief Metodo que se utiliza para añadir los eventos al registro
+ * 
+ * @param is_open Un booleano que representa el estado de la puerta
+ */
 static void add_log_event(bool is_open) {
     time_t now;
     time(&now);
@@ -118,7 +141,9 @@ static void add_log_event(bool is_open) {
     }
 }
 
-/* Connect to WiFi station */
+/**
+ * @brief Este metodo se encarga de iniciar la configuracion del Wi-Fi 
+ */
 void wifi_init_sta(void) {
     esp_netif_init();
     esp_event_loop_create_default();
@@ -140,7 +165,13 @@ void wifi_init_sta(void) {
     ESP_LOGI(TAG, "wifi_init_sta finished.");
 }
 
-//Funcion para verificar credenciales
+/**
+ * @brief Este metodo se encarga de revisar que quien se conecte a la app-web se un administrador
+ * 
+ * @param req Este parametro son las credenciales que se envian de la pagina web para ser validados
+ * @return true 
+ * @return false 
+ */
 static bool check_http_basic_auth(httpd_req_t *req) {
     char auth_hdr[128] = {0};
     if (httpd_req_get_hdr_value_str(req, "Authorization", auth_hdr, sizeof(auth_hdr)) == ESP_OK) {
@@ -169,7 +200,12 @@ static bool check_http_basic_auth(httpd_req_t *req) {
     return false;
 }
 
-/* HTTP Server Handlers */
+/**
+ * @brief Este metodo se encarga de crear y mostrar la pagina principal de la aplicacion web
+ * 
+ * @param req 
+ * @return esp_err_t 
+ */
 esp_err_t root_get_handler(httpd_req_t *req) {
     if (!check_http_basic_auth(req)) return ESP_FAIL;
     httpd_resp_set_type(req, "text/html");
@@ -177,6 +213,12 @@ esp_err_t root_get_handler(httpd_req_t *req) {
     return ESP_OK;
 }
 
+/**
+ * @brief Este metodo se encarga de crear y mostrar la pagina de registros de actividad de la aplicacion web
+ * 
+ * @param req 
+ * @return esp_err_t 
+ */
 esp_err_t logs_get_handler(httpd_req_t *req) {
     struct tm timeinfo;
     int idx = 0;
@@ -211,7 +253,12 @@ esp_err_t logs_get_handler(httpd_req_t *req) {
     return ESP_OK;
 }
 
-
+/**
+ * @brief Este metodo se encarga de manejar la pagina de configuracion de estados de la aplicacion web
+ * 
+ * @param req 
+ * @return esp_err_t 
+ */
 esp_err_t config_get_handler(httpd_req_t *req) {
     if (!check_http_basic_auth(req)) return ESP_FAIL;
     httpd_resp_set_type(req, "text/html");
@@ -219,6 +266,12 @@ esp_err_t config_get_handler(httpd_req_t *req) {
     return ESP_OK;
 }
 
+/**
+ * @brief Este metodo se encarga de manejar la pagina principal de la aplicacion web
+ * 
+ * @param req 
+ * @return esp_err_t 
+ */
 esp_err_t config_set_handler(httpd_req_t *req) {
     char buf[256];
     int total_len = req->content_len;
@@ -256,12 +309,24 @@ esp_err_t config_set_handler(httpd_req_t *req) {
 }
 
 
+/**
+ * @brief Este metodo se encarga de manejar el estado de la puerta
+ * 
+ * @param req 
+ * @return esp_err_t 
+ */
 esp_err_t door_state_handler(httpd_req_t *req) {
     httpd_resp_set_type(req, "text/plain");
     httpd_resp_send(req, door_open ? "OPEN" : "CLOSED", HTTPD_RESP_USE_STRLEN);
     return ESP_OK;
 }
 
+/**
+ * @brief Este metodo se encarga de manejar el estado abierto de la puerta
+ * 
+ * @param req 
+ * @return esp_err_t 
+ */
 esp_err_t door_open_handler(httpd_req_t *req) {
     servo_open(); // HIGH
     door_open = true;
@@ -271,6 +336,12 @@ esp_err_t door_open_handler(httpd_req_t *req) {
     return ESP_OK;
 }
 
+/**
+ * @brief Este metodo se encarga de manejar el estado cerrado de la puerta
+ * 
+ * @param req 
+ * @return esp_err_t 
+ */
 esp_err_t door_close_handler(httpd_req_t *req) {
     servo_close(); // LOW
     door_open = false;
@@ -280,6 +351,11 @@ esp_err_t door_close_handler(httpd_req_t *req) {
     return ESP_OK;
 }
 
+/**
+ * @brief Este metodo se encarga de iniciar el web_server con todos los metodos anteriores de configuracion
+ * 
+ * @return httpd_handle_t 
+ */
 httpd_handle_t start_webserver(void) {
     httpd_config_t config = HTTPD_DEFAULT_CONFIG();
     httpd_handle_t server = NULL;
@@ -302,6 +378,10 @@ httpd_handle_t start_webserver(void) {
     return server;
 }
 
+/**
+ * @brief Este metodo termina la configuracion y pasa los valores adecuados a los metodos anteriormente mencionados
+ *          permite iniciar la pagina web-desde el main del proyecto
+ */
 void app_web_init(void) {
     ESP_ERROR_CHECK(nvs_flash_init());
 
@@ -313,9 +393,11 @@ void app_web_init(void) {
     servo_init(18);
     start_webserver();
     ESP_LOGI(TAG, "Servidor HTTP iniciado");
-    // NO bucle infinito aquí; el main() será quien gestione el ciclo de la app
 }
 
+/**
+ * @brief Este metodo se encarga de actualizar la puerta a abierto en caso de que esta llamada ocurra fuera de la logica de app_web.c
+ */
 void actualizar_puerta_a_abierta(void) {
     door_open = true;
     last_action = esp_log_timestamp();
@@ -323,6 +405,9 @@ void actualizar_puerta_a_abierta(void) {
     ESP_LOGI(TAG, "Puerta actualizada a ABIERTA (via función)");
 }
 
+/**
+ * @brief Este metodo se encarga de actualizar la puerta a cerrado en caso de que esta llamada ocurra fuera de la logica de app_web.c
+ */
 void actualizar_puerta_a_cerrada(void) {
     door_open = false;
     last_action = esp_log_timestamp();
