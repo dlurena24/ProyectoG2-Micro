@@ -59,7 +59,7 @@ Sistema de automatización de puertas que combina detección inteligente de pres
 
 ## Dependencias Necesarias
 
-- Framework ESP-IDS
+- Framework ESP-IDF
 
 ---
 
