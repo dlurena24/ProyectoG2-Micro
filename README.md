@@ -23,8 +23,8 @@ Sistema de automatización de puertas que combina detección inteligente de pres
 - Apertura automática sin contacto físico
 
 #### Control y Monitoreo Remoto
-- Gestión completa desde smartphone via Wi-Fi
-- Apertura/cierre manual desde la aplicación móvil
+- Gestión completa desde web via Wi-Fi
+- Apertura/cierre manual desde la aplicación web
 - Estado actual de la puerta (abierta/cerrada)
 - Registro de eventos de acceso
 
