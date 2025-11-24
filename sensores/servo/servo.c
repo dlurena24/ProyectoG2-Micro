@@ -28,6 +28,11 @@ static uint32_t pulse_to_duty(uint32_t us)
     return (us * ((1 << 13) - 1)) / period_us;
 }
 
+/**
+ * @brief Este metodo se encarga de inicializar el servo en el pin indicado
+ * 
+ * @param gpio Pin al que se desea esscribir la señal
+ */
 void servo_init(int gpio)
 {
     servo_gpio = gpio;
@@ -56,6 +61,11 @@ void servo_init(int gpio)
     ESP_LOGI(TAG, "Servo inicializado en GPIO %d", gpio);
 }
 
+/**
+ * @brief Este metodo se encarga de colocar los angulos al que se va enviar el servo
+ * 
+ * @param degrees El angulo al que se desea que apunte el servo
+ */
 void servo_set_angle(float deg)
 {
     if (deg < 0) deg = 0;
@@ -70,6 +80,14 @@ void servo_set_angle(float deg)
     ledc_update_duty(SERVO_LEDC_MODE, SERVO_LEDC_CH);
 }
 
+/**
+ * @brief Este metodo se encarga de mover angulo a angulo el servo hasta la posicion deseada
+ * 
+ * @param start_deg Angulo de inicio
+ * @param end_deg Angulo final
+ * @param step_deg Cantidad de angulos por paso
+ * @param step_delay_ms Tiempo entre angulos
+ */
 void servo_move_smooth(float start_deg, float end_deg, float step_deg, int delay_ms)
 {
     if (step_deg <= 0) step_deg = 1;
@@ -96,11 +114,19 @@ void servo_move_smooth(float start_deg, float end_deg, float step_deg, int delay
     servo_set_angle(end_deg);
 }
 
+/**
+ * @brief Este metodo pone el servo en la posicion de abierto solo para la puerta
+ * 
+ */
 void servo_open(void)
 {
     servo_move_smooth(0, 120, 2, 15);
 }
 
+/**
+ * @brief Este metodo se encarga poner el servo en poscion de cerrado, solo para la puerta
+ * 
+ */
 void servo_close(void)
 {
     servo_move_smooth(120, 0, 2, 15);
