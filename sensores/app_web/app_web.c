@@ -13,8 +13,8 @@
 #include "mbedtls/base64.h"
 #include "servo.h"
 
-#define WIFI_SSID      "K2300PT"
-#define WIFI_PASS      "Chocolate-2307"
+#define WIFI_SSID      "Kendall2300"
+#define WIFI_PASS      "chocolate270"
 #define HTTP_AUTH_USERNAME "admin"
 #define HTTP_AUTH_PASSWORD "akmc23"
 #define LOG_CAPACITY 25
