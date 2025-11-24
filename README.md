@@ -32,97 +32,34 @@ Sistema de automatización de puertas que combina detección inteligente de pres
 
 ## Instrucciones de Compilación y Ejecución
 
-# Mostrar los eventos en el HTML
+### Instalar ESP-IDF en VsCode
 
-El programa envia los eventos en el siguiente formato:
+<img width="1308" height="734" alt="33" src="https://github.com/user-attachments/assets/9c2e1b33-835f-4be5-90ee-59841e84ac68" />
 
-```json
-{ "event": "door_action", "message": "Opening door", "timestamp": 123456 }
-```
+### Abrir el setup de ESP-IDF
+<img width="1009" height="702" alt="44" src="https://github.com/user-attachments/assets/56e146b9-7cf7-4fb3-b6da-52a2cc87e608" />
 
-Hay que hacer que:
+### Configurarlo de acuerdo a lo observado en la imagen y apretar instalar
+<img width="1148" height="711" alt="11" src="https://github.com/user-attachments/assets/f79b0aa7-3b95-4f43-a45a-9988973f7a05" />
 
-1. El ESP32 que tiene la **web app** lea los eventos vía `Serial.read()`.
-2. Despues guarde los eventos leídos en un **array** de eventos.
-3. El HTML haga `fetch("/events)`.
-4. El ESP32 responda con un **JSON** que contenga todos los eventos.
+## Una vez configurado e instalado, se abrira una pestaña como la siguiente:
+#<img width="1360" height="768" alt="22" src="https://github.com/user-attachments/assets/53a5793c-424a-4452-9afd-e53fa1144b1c" />
 
-## Buffer de eventos
+## Desde la barra de VsCode, abrir el folder del proyecto
+<img width="1360" height="768" alt="55" src="https://github.com/user-attachments/assets/1c910780-cdbc-4570-9e6d-5e53498b7630" />
 
-```cpp
-String eventLog[20];
-int eventIndex = 0;
+## Seleccionar la carpeta de "sensores"
+<img width="1360" height="768" alt="66" src="https://github.com/user-attachments/assets/004895bd-7cd5-462d-ad8d-1749979babbf" />
 
-void addEvent(String e) {
-  eventLog[eventIndex] = e;
-  eventIndex = (eventIndex + 1) % 20; // Circular buffer
-}
-```
+## Abrir el menú lateral de EXPRESSIF y seleccionar "Full clean" para poder seleccionar "Build project" 
+<img width="1360" height="768" alt="77" src="https://github.com/user-attachments/assets/7c9f0202-e35e-41e3-8285-75b02fc0cfec" />
 
-## Leer serial
-
-```cpp
-void readSerialEvents() {
-  while (Serial.available()) {
-    String line = Serial.readStringUntil('\n');
-    line.trim();
-    if (line.length() > 0) {
-      addEvent(line);
-    }
-  }
-}
-```
-
-## Crear endpoint para el monitoreo
-
-```cpp
-void handleEvents() {
-  String json = "[";
-  for (int i = 0; i < 20; i++) {
-    if (eventLog[i].length() > 0) {
-      json += eventLog[i] + ",";
-    }
-  }
-  if (json.endsWith(",")) json.remove(json.length() - 1);
-  json += "]";
-
-  server.send(200, "application/json", json);
-}
-```
-
-## Agregar endpoint
-
-En `setup()`:
-
-```cpp
-server.on("/events", HTTP_GET, handleEvents);
-```
-
-## Mostrar eventos en el HTML
-
-```cpp
-<script>
-function updateEvents() {
-  fetch("/events")
-    .then(r => r.json())
-    .then(events => {
-      const div = document.getElementById("monitor");
-      div.innerHTML = events.map(e => `<p>${e}</p>`).join("");
-    });
-}
-
-setInterval(updateEvents, 500); // cada medio segundo
-</script>
-
-<div id="monitor"></div>
-```
-
-
+- *Nota:* Recuerde seleccionar el puerto donde se encuentra la ESP32, y si no utiliza una ESP32, seleccionar "Set EXPRESSIF device target" para poder definir cual es la placa a la que se le va a hacer el build. Seguidamente puede seleccionar "Flash device" para subir su imagen al dispositivo.
 ---
 
 ## Dependencias Necesarias
 
-- Framework ESP IDS
+- Framework ESP-IDS
 
 ---
 
