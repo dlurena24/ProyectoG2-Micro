@@ -13,7 +13,10 @@ static const char *TAG = "ACELEROMETRO";
 // Sensibilidad
 #define MPU_ACEL_SENSIBILIDAD     16384.0f
 
-// Inicializa el acelerometro
+/**
+ * @brief Este metodo se encarga de incializar el acelerometro
+ * 
+ */
 void acelerometro_init(void)
 {
     acelerometro_i2c_init();
@@ -26,7 +29,14 @@ void acelerometro_init(void)
     }
 }
 
-// Leer los valores del acelerómetro
+/**
+ * @brief Este metodo se encarga de leer los datos directos del acelerometrio
+ * 
+ * @param ax 
+ * @param ay 
+ * @param az 
+ * @return esp_err_t 
+ */
 esp_err_t acelerometro_leer_raw(int16_t *ax, int16_t *ay, int16_t *az)
 {
     uint8_t data[6];
@@ -41,7 +51,14 @@ esp_err_t acelerometro_leer_raw(int16_t *ax, int16_t *ay, int16_t *az)
     return ESP_OK;
 }
 
-// Convertir valores a unidades de g
+/**
+ * @brief Este metodo se encarga de leer los valores g del acelerometro
+ * 
+ * @param ax 
+ * @param ay 
+ * @param az 
+ * @return esp_err_t 
+ */
 esp_err_t acelerometro_leer_g(float *ax, float *ay, float *az)
 {
     int16_t raw_x, raw_y, raw_z;
@@ -58,7 +75,14 @@ esp_err_t acelerometro_leer_g(float *ax, float *ay, float *az)
     return ESP_OK;
 }
 
-// Calcular magnitud de la aceleración
+/**
+ * @brief Este metodo se encarga de calcular la magnitud total de la aceleracion
+ * 
+ * @param ax 
+ * @param ay 
+ * @param az 
+ * @return float 
+ */
 float acelerometro_magnitud(float ax, float ay, float az)
 {
     return sqrtf(ax*ax + ay*ay + az*az);

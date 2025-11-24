@@ -1,3 +1,5 @@
-idf_component_register(SRCS "servo.c"
-                       INCLUDE_DIRS "."
-                       REQUIRES driver)
+idf_component_register(
+    SRCS "servo.c"
+    INCLUDE_DIRS "."
+    REQUIRES driver
+)

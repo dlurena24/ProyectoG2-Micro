@@ -1,15 +1,16 @@
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
+
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "esp_log.h"
-
 #include "ultrasonico.h"
 #include "acelerometro.h"
 #include "servo.h"
+#include "app_web.h"
 
-// DOOR PARAMS=
+// DOOR PARAMS
 static const int distanceToOpen = 30;                 // cm
 static const uint64_t timeToWaitForClose = 3000;      // ms
 static const float impactThreshold = 2.5f;            // m/s^2
@@ -23,7 +24,6 @@ typedef enum {
 
 static DoorState doorState = STOPPED;
 static uint64_t lastPresenceTime = 0;
-
 static float baselineAccel = 9.8f;
 
 uint64_t millis()
@@ -161,6 +161,7 @@ static void door_task(void *arg)
         // ---- READ ACCELEROMETER ----
         float accel = readAccelerometer();
         float delta = fabsf(accel - baselineAccel);
+
         if (delta >= impactThreshold) {
             emitEvent("impact", "Impact detected");
             handleImpact();
@@ -170,6 +171,7 @@ static void door_task(void *arg)
         int distance = readDistance();
         if (distance <= distanceToOpen) {
             openDoor();
+            actualizar_puerta_a_abierta();
             lastPresenceTime = millis();
         }
 
@@ -178,6 +180,7 @@ static void door_task(void *arg)
             (millis() - lastPresenceTime > timeToWaitForClose))
         {
             closeDoor();
+            actualizar_puerta_a_cerrada();
         }
 
         vTaskDelay(pdMS_TO_TICKS(100));
@@ -186,13 +189,15 @@ static void door_task(void *arg)
 
 void app_main(void)
 {
+    app_web_init();
     ESP_LOGI("SYSTEM", "Automatic door system started.");
 
-    servo_init(4); 
+    servo_init(18); 
     ultrasonico_init();
     acelerometro_init();
 
     calibrate_accelerometer();
 
     xTaskCreate(door_task, "door_task", 4096, NULL, 5, NULL);
+    
 }

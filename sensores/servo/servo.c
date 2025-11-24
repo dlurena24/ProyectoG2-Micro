@@ -1,65 +1,94 @@
 #include "servo.h"
-#include "driver/rmt_tx.h"
-#include "driver/rmt_encoder.h"
+#include "driver/ledc.h"
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
 #include "esp_log.h"
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
+
 
 static const char *TAG = "SERVO";
 
-#define SERVO_MIN_US 500     // microsegundos 0°
-#define SERVO_MAX_US 2400    // microsegundos 180°
+// CONFIG
+#define SERVO_MIN_US 500
+#define SERVO_MAX_US 2400
 #define SERVO_FREQ_HZ 50
 
-static rmt_channel_handle_t tx_channel = NULL;
-static rmt_encoder_handle_t pwm_encoder = NULL;
-static int servo_gpio_pin = -1;
+// LEDC
+#define SERVO_LEDC_TIMER   LEDC_TIMER_0
+#define SERVO_LEDC_MODE    LEDC_LOW_SPEED_MODE
+#define SERVO_LEDC_CH      LEDC_CHANNEL_0
 
-// convierte grados → microsegundos
-static uint32_t angle_to_pulse(float deg)
+static int servo_gpio = -1;
+
+// microsegundos a duty
+static uint32_t pulse_to_duty(uint32_t us)
 {
-    if (deg < 0) deg = 0;
-    if (deg > 180) deg = 180;
-    return SERVO_MIN_US + (deg / 180.0f) * (SERVO_MAX_US - SERVO_MIN_US);
+    uint32_t period_us = 1000000 / SERVO_FREQ_HZ; // 20000 us
+    return (us * ((1 << 13) - 1)) / period_us;
 }
 
+/**
+ * @brief Este metodo se encarga de inicializar el servo en el pin indicado
+ * 
+ * @param gpio Pin al que se desea esscribir la señal
+ */
 void servo_init(int gpio)
 {
-    servo_gpio_pin = gpio;
+    servo_gpio = gpio;
 
-    rmt_tx_channel_config_t tx_cfg = {
-        .gpio_num = gpio,
-        .clk_src = RMT_CLK_SRC_DEFAULT,
-        .mem_block_symbols = 64,
-        .resolution_hz = 1000000,       // 1 MHz
-        .trans_queue_depth = 4,
-    };
-    rmt_new_tx_channel(&tx_cfg, &tx_channel);
-
-    rmt_pwm_encoder_config_t enc_cfg = {
-        .resolution = 1000000, // 1 MHz
+    // configurar timer
+    ledc_timer_config_t timer = {
+        .speed_mode = SERVO_LEDC_MODE,
+        .duty_resolution = LEDC_TIMER_13_BIT,
+        .timer_num = SERVO_LEDC_TIMER,
         .freq_hz = SERVO_FREQ_HZ,
-        .duty_cycle = 0.05,             // placeholder
     };
+    ledc_timer_config(&timer);
 
-    rmt_new_pwm_encoder(&enc_cfg, &pwm_encoder);
-
-    rmt_enable(tx_channel);
+    // configurar canal
+    ledc_channel_config_t ch = {
+        .gpio_num = gpio,
+        .speed_mode = SERVO_LEDC_MODE,
+        .channel = SERVO_LEDC_CH,
+        .intr_type = LEDC_INTR_DISABLE,
+        .timer_sel = SERVO_LEDC_TIMER,
+        .duty = 0,
+        .hpoint = 0
+    };
+    ledc_channel_config(&ch);
 
     ESP_LOGI(TAG, "Servo inicializado en GPIO %d", gpio);
 }
 
-void servo_set_angle(float degrees)
+/**
+ * @brief Este metodo se encarga de colocar los angulos al que se va enviar el servo
+ * 
+ * @param degrees El angulo al que se desea que apunte el servo
+ */
+void servo_set_angle(float deg)
 {
-    uint32_t pulse = angle_to_pulse(degrees);
+    if (deg < 0) deg = 0;
+    if (deg > 180) deg = 180;
 
-    rmt_pwm_encoder_set_pulse_width(pwm_encoder, pulse);
+    uint32_t us = SERVO_MIN_US +
+                  (deg / 180.0f) * (SERVO_MAX_US - SERVO_MIN_US);
 
-    rmt_transmit_config_t tx_config = {};
-    rmt_transmit(tx_channel, pwm_encoder, NULL, &tx_config);
+    uint32_t duty = pulse_to_duty(us);
 
-    ESP_LOGI(TAG, "Ángulo %.1f° → %dus", degrees, pulse);
+    ledc_set_duty(SERVO_LEDC_MODE, SERVO_LEDC_CH, duty);
+    ledc_update_duty(SERVO_LEDC_MODE, SERVO_LEDC_CH);
 }
 
-void servo_move_smooth(float start_deg, float end_deg, float step_deg, int step_delay_ms)
+/**
+ * @brief Este metodo se encarga de mover angulo a angulo el servo hasta la posicion deseada
+ * 
+ * @param start_deg Angulo de inicio
+ * @param end_deg Angulo final
+ * @param step_deg Cantidad de angulos por paso
+ * @param step_delay_ms Tiempo entre angulos
+ */
+void servo_move_smooth(float start_deg, float end_deg, float step_deg, int delay_ms)
 {
     if (step_deg <= 0) step_deg = 1;
 
@@ -67,34 +96,38 @@ void servo_move_smooth(float start_deg, float end_deg, float step_deg, int step_
 
     if (end_deg > start_deg)
     {
-        // ascendente
         for (pos = start_deg; pos <= end_deg; pos += step_deg)
         {
             servo_set_angle(pos);
-            vTaskDelay(pdMS_TO_TICKS(step_delay_ms));
+            vTaskDelay(pdMS_TO_TICKS(delay_ms));
         }
     }
     else
     {
-        // descendente
         for (pos = start_deg; pos >= end_deg; pos -= step_deg)
         {
             servo_set_angle(pos);
-            vTaskDelay(pdMS_TO_TICKS(step_delay_ms));
+            vTaskDelay(pdMS_TO_TICKS(delay_ms));
         }
     }
 
-    // posición final
     servo_set_angle(end_deg);
 }
 
-
+/**
+ * @brief Este metodo pone el servo en la posicion de abierto solo para la puerta
+ * 
+ */
 void servo_open(void)
-{ 
-    servo_move_smooth(0, 120, 2, 15);   // placeholder antes de prueba fisica
+{
+    servo_move_smooth(0, 120, 2, 15);
 }
 
-void servo_close(void)      
+/**
+ * @brief Este metodo se encarga poner el servo en poscion de cerrado, solo para la puerta
+ * 
+ */
+void servo_close(void)
 {
-    servo_move_smooth(120, 0, 2, 15);   // placeholder antes de prueba   
+    servo_move_smooth(120, 0, 2, 15);
 }
