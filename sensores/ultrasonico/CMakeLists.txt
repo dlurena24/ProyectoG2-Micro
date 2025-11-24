@@ -1,0 +1,12 @@
+idf_component_register(
+    SRCS
+        "ultrasonico.c"
+        "ultrasonico_isr.c"
+        "ultrasonico_timer.c"
+    INCLUDE_DIRS
+        "."
+    PRIV_REQUIRES
+        driver
+        esp_common
+        esp_rom
+)
