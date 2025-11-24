@@ -94,5 +94,5 @@ Cada lectura genera:
   "timestamp": <ms>
 }
 ```
-
-La WebApp almacena un buffer FIFO de últimos 25 eventos.
+Estos eventos unicamente se pueden visualizar desde eventos de consola del sistema 
+La WebApp almacena un buffer FIFO de últimos 25 estados de la puerta.
